@@ -134,6 +134,26 @@ async def run_test(base_url: str, token: Optional[str], concurrency: int, reques
         success_rate = (stats["success"] / stats["total"]) * 100
         avg_latency = sum(stats["latencies"]) / len(stats["latencies"])
         print(f"{endpoint}: {stats['success']}/{stats['total']} ({success_rate:.1f}%) - avg: {avg_latency:.1f}ms")
+    
+    # Notas sobre os resultados
+    print("\n=== Notas ===")
+    if success == total:
+        print("Todas as requisições foram bem-sucedidas!")
+    elif success > 0:
+        print(f"Algumas requisições falharam ({errors} de {total}). Verifique as rotas ou o servidor.")
+    else:
+        print("Todas as requisições falharam. Verifique o servidor ou os endpoints configurados.")
+
+    if latencies:
+        print(f"A menor latência foi {min(latencies):.2f}ms e a maior foi {max(latencies):.2f}ms.")
+        print(f"A latência média foi {sum(latencies) / len(latencies):.2f}ms.")
+
+    # Melhor e pior endpoint
+    best_endpoint = min(endpoint_stats.items(), key=lambda x: sum(x[1]["latencies"]) / len(x[1]["latencies"]))
+    worst_endpoint = max(endpoint_stats.items(), key=lambda x: sum(x[1]["latencies"]) / len(x[1]["latencies"]))
+
+    print(f"Melhor endpoint: {best_endpoint[0]} com latência média de {sum(best_endpoint[1]['latencies']) / len(best_endpoint[1]['latencies']):.2f}ms.")
+    print(f"Pior endpoint: {worst_endpoint[0]} com latência média de {sum(worst_endpoint[1]['latencies']) / len(worst_endpoint[1]['latencies']):.2f}ms.")
 
 
 def default_endpoints() -> List[EndpointConfig]:
